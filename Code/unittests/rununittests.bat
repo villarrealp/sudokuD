@@ -1,0 +1,3 @@
+testsettings.py
+testconfigurexml.py
+testconsolemenu.py

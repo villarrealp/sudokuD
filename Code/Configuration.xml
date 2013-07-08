@@ -1,0 +1,58 @@
+<ConfigurationFile>
+    <Settings>
+        <GameOption>
+            <item name="Solve" />
+            <item name="Generate" />
+            <item name="Change Settings" />
+            <item name="Exit" />
+        </GameOption>
+        <DifficultyLevel>
+            <item name="Easy" />
+            <item name="Medium" />
+            <item name="Hard" />
+        </DifficultyLevel>
+        <AlgorithmOption>
+            <item name="BackTracking" />
+            <item name="Peter Norvig" />
+            <item name="Exact" />
+        </AlgorithmOption>
+        <OutputFormat>
+            <item name="Console" />
+            <item name="File" />
+        </OutputFormat>
+        <FilePath>
+            <item name="c:\user\" />
+        </FilePath>
+        <FileName>
+            <item name="SudokuFile.txt" />
+        </FileName>
+        <MatrixDimension>
+            <item name="9" />
+        </MatrixDimension>
+    </Settings>
+
+    <UserSettings>
+        <GameOption>
+            <item name="Solve" />            
+        </GameOption>
+        <DifficultyLevel>
+            <item name="Easy" />
+        </DifficultyLevel>
+        <AlgorithmOption>
+            <item name="Peter Norvig" />
+        </AlgorithmOption>
+        <OutputFormat>
+            <item name="Console" />
+        </OutputFormat>
+        <FilePath>
+            <item name="c:\user\SudokuFile.txt" />
+        </FilePath>
+        <FileName>
+            <item name="SudokuFile.txt" />
+        </FileName>
+        <MatrixDimension>
+            <item name="9" />
+        </MatrixDimension>
+    </UserSettings>
+    
+</ConfigurationFile>
