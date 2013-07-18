@@ -9,7 +9,7 @@ Modified: 07/08/2013 by Pilar Villarreal
                     final project.
           07/15/2013 by Pilar Villarreal
                 Comments:
-                    Removed unncesary code, comments from original algorithm
+                    Removed unused code and comments from original algorithm
 
 Revised by: -
 
@@ -26,16 +26,20 @@ class BacktrackingAlgorithm(Algorithm):
 
     def __init__(self, grids):
         """
-        This method initializes the BacktrackingAlgorithm.
+        Constructor method for the BacktrackingAlgorithm child class.
 
-        Attributes:
+        Keyword arguments:
+        grids -- String which contains the unsolved game, it should have 81
+        characters, all of them digits 0-9, for example:
+        "008009320000080040900500007000040090000708000060020000600001008050030000072900100"
 
-        puzzle - Matrix which contains the values of the solved game.
-        blanks - Array which contain blank spots
-        runningTime - Store the time taken during algorithm execution
-
+        Class attributes:
+        puzzle -- Matrix of integers, will contain the values of the solved game.
+        blanks -- Array of tuples, it contains position of the blank spots
+        in follow format: (rowIndex, colIndex)
+        runningTime -- Float to store the time taken during algorithm execution.
         """
-        Algorithm.__init__(self,grids)
+        Algorithm.__init__(self, grids)
 
         self.puzzle = []
         self.blanks = []
@@ -52,7 +56,15 @@ class BacktrackingAlgorithm(Algorithm):
         self.solve(self.puzzle)
 
     def solve(self, puzzleArray):
-        """ Solve the Sudoku puzzle using the selected algorithm. """
+        """
+        Solve the Sudoku puzzle using the selected algorithm.
+
+        Keyword arguments:
+        puzzleArray -- Matrix of integers with the puzzle unsolved.
+
+        Return:
+        This method returns the puzzle solved using BackTracking algorithm.
+        """
         print "Solving with backtracking."
         self.runningTime = time.clock()
         self.backTrack(0)
@@ -60,9 +72,13 @@ class BacktrackingAlgorithm(Algorithm):
 
     def backTrack(self, index):
         """
-        Solve Sudoku using plain backtracking
-        Uses a recursive algorithm to try each value 1-9 in each blank square,
-        backtracking when it was not able to put in any value into the square.
+        This method solves the Sudoku puzzle using a recursive algorithm to try
+        each value 1-9 in each blank square, backtracking when it was not able
+        to put in any value into the square.
+
+        Keyword arguments:
+        index -- Integer to access an element in the tuples array of blank spots
+        stored at self.blanks attribute.
         """
         if index > len(self.blanks) - 1:
             self.endAlgorithm()
@@ -80,16 +96,22 @@ class BacktrackingAlgorithm(Algorithm):
 
     def puzzleValid(self, row, col ,num):
         """
-        Check if the current puzzle is legal after placing num in (row, col)
-        The "heur" option is to bypass the constraint check increment
-        when using this method for a heuristic, in which case the
-        heuristic usage shouldn't count toward the constraint checks.
+        This method checks if the current puzzle is legal after placing num in
+        (row, col).
+
+        Keyword arguments:
+        row -- Row number position in the matrix to place num.
+        col -- Column number position in the matrix to place num.
+        num -- Value to be validated in specified row and column.
+
+        Return:
+        This method returns True if row, column, and box have no violations
+        to meet Sudoku game rules, false otherwise.
         """
         valid = False
         if num == 0:
-            return True
+            valid = True
         else:
-            #Return true if row, column, and box have no violations
             rowValid = self.checkRow(row, num)
             colValid = self.checkColumn(col, num)
             boxValid = self.checkBox(row, col, num)
@@ -97,15 +119,35 @@ class BacktrackingAlgorithm(Algorithm):
         return valid
 
     def checkRow(self, row, num ):
-        """ Check if num is a legal value for the given row. """
+        """
+        This method checks if num is a legal value for the given row.
+
+        Keyword arguments:
+        row -- Row number position in the matrix to place num.
+        num -- Value to be validated in specified row.
+
+        Return:
+        This method returns True if num placed in row specified is a legal
+        value, false otherwise.
+        """
         for col in range(9):
             currentValue = self.puzzle[row][col]
             if num == currentValue:
                 return False
         return True
 
-    def checkColumn(self, col, num ):
-        """ Check if num is a legal value for the given column. """
+    def checkColumn(self, col, num):
+        """
+        This method checks if num is a legal value for the given column.
+
+        Keyword arguments:
+        col -- Column number position in the matrix to place num.
+        num -- Value to be validated in specified column.
+
+        Return:
+        This method returns True if num placed in column specified is a
+        legal value, false otherwise.
+        """
         for row in range(9):
             currentValue = self.puzzle[row][col]
             if num == currentValue:
@@ -114,45 +156,63 @@ class BacktrackingAlgorithm(Algorithm):
 
     def checkBox(self, row, col, num):
         """
-        Check if num is a legal value for the box (one of 9 boxes)
-        containing given row/col
-        """
-        row = (row/3) * 3
-        col = (col/3) * 3
+        This method checks if num is a legal value for the box (one of 9 boxes
+        of the matrix) containing given row and column.
 
-        for r in range(3):
-            for c in range(3):
-                if self.puzzle[row + r][col + c] == num:
+        Keyword arguments:
+        row -- Row number position in the matrix to place num.
+        col -- Column number position in the matrix to place num.
+        num -- Value to be validated in specified row and column.
+
+        Return:
+        This method returns True if num placed in row and column specified
+        is a legal value in the box where belongs, false otherwise.
+        """
+        row = (row / 3) * 3
+        col = (col / 3) * 3
+
+        for rowIndex in range(3):
+            for colIndex in range(3):
+                if self.puzzle[row + rowIndex][col + colIndex] == num:
                     return False
         return True
 
     def endAlgorithm(self):
         """
-        Generic method to end the algorithm in process, calculate the running
-        time, output the solution file, print the metrics and exit.
+        Method to end the algorithm in process, calculate the running
+        time and exit.
         """
         self.runningTime = time.clock() - self.runningTime
         sys.exit(0)
 
     def getEmptyCells(self, puzzle):
         """
-        Get all the empty cells in the puzzle.
+        This method searchs for the empty places in the matrix (the places with
+        0 as value) and store its position (row, column) in the emptyCells array.
+
+        Keyword arguments:
+        puzzle -- Matrix of integers which contains unsolved game.
+
+        Return:
+        This method returns an array of tuples with the positios of empty
+        places of the unsolved matrix.
+        i.e.: [(row, colum)]  = [(3, 2)]
         """
         emptyCells = []
-        for i in range(9):
-            for j in range(9):
-                if self.puzzle[i][j] == 0:
-                    emptyCells.append((i, j))
+        for row in range(9):
+            for column in range(9):
+                if self.puzzle[row][column] == 0:
+                    emptyCells.append((row, column))
         return emptyCells
 
     def initPuzzleArray(self):
         """
-        Constructs the blank puzzle array to have 0 0 0 0 0...for all rows
-        and columns
+        This method constructs the blank puzzle array to have 0 0 0 0 0...
+        for all rows and columns
         """
         del self.puzzle[:]
-        for i in range(9):
+        for row in range(9):
             self.puzzle.append([])
-            for j in range(9):
-                self.puzzle[i].append([])
-                self.puzzle[i][j] = 0
+            for col in range(9):
+                self.puzzle[row].append([])
+                self.puzzle[row][col] = 0
