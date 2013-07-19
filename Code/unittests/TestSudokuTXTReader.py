@@ -14,6 +14,7 @@ sys.path.append(lib_path)
 from SudokuTXTReader import SudokuTXTReader
 
 class TestSudokuTXTReader(unittest.TestCase):
+
     def setUp(self):
         self.txtObject = SudokuTXTReader("requiredtestfiles/sudokusolve.txt", 9)
 
@@ -56,5 +57,5 @@ class TestSudokuTXTReader(unittest.TestCase):
         expected = wrongFormatTXTObject._countRowsSizeEntries()
         self.assertFalse(expected)
 
-if  __name__=='__main__':
+if  __name__ == '__main__':
     unittest.main()
