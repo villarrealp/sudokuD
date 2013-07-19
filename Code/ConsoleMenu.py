@@ -6,6 +6,8 @@ Modified:       07/04/2013 by Pilar Villarreal
                 07/15/2013 by Pilar Villarreal
                 Comments: Updated due to last changes to Settings class,
                 added comments to methods to display the solved matrix.
+                07/18/2013 by Pilar Villarreal
+                Comments: Code refactoring and added more documentation.
 Revised by: -
 
 """
@@ -22,34 +24,48 @@ from SudokuTXTReader import SudokuTXTReader
 """
 Class Name: ConsoleMenu
 
-Description: This clase displays the menu options for the game extracted from
-             the XML file.
+Description: This class uses the Settings extracted from the XML files and
+             displays the menu options for the game in the console.
 """
 
 class ConsoleMenu:
 
     def __init__(self, userSettings, defaultSettings):
-        """ Constructor method for the ConsoleMenu class. """
+        """
+        Constructor method for the ConsoleMenu class.
+
+        Keyword arguments:
+        userSettings - Filename of the XML with the user settings.
+        defaultSettings - Filename of the XML with the default settings.
+        """
         self.settingsSudoku = Settings(userSettings, defaultSettings)
 
-    def getAStringLine(self, charDraw, length):
+    def printLine(self, charSelected, length):
         """
-        This method returns a string simulating a line using specified char in
-        parameters.
-        """
-        line = charDraw
-        for index in range(length):
-            line = line + charDraw
-        return line
+        This method prints a line in console using the specified char.
 
-    def drawMenuOptions(self, title, listOfOptions):
+        Keyword arguments:
+        charSelected -- Char user to print the line
+        length -- Integer value to determinate the length for the line.
         """
-        This method draws in console the Menu for a list of options extracted
-        from the XML file.
+        line = charSelected
+        for index in range(length):
+            line = line + charSelected
+        print line
+
+    def displayMenuOptions(self, title, listOfOptions):
         """
-        print self.getAStringLine("=", 50)
-        print self.getAStringLine(" ", 20) + title
-        print self.getAStringLine("=", 50)
+        This method displays in console a menu list enumareted with options
+        extracted from the XML file.
+
+        Keyword arguments:
+        title -- String with description of the menu to be displayed.
+        listOfOptions -- List of strings with the available options to be
+        displayed extracted from the XMLfile.
+        """
+        self.printLine("=", 50)
+        print("                  ") + title
+        self.printLine("=", 50)
         print("         Please select an option:")
         index = 1
         for option in listOfOptions:
@@ -57,155 +73,131 @@ class ConsoleMenu:
                   + "                ")
             index = index + 1
 
-    def getUserInput(self):
-        """ This method returns a string with the value entered by the user. """
-        userInput = raw_input("Enter the number of the  option: ")
+    def getUserInput(self, textDescription):
+        """
+        This method uses raw_input function to store the option selected by the
+        user.
+
+        Keyword arguments:
+        textDescription -- Description to be displayed to describe required
+        input, i.e.: 'Enter the number of the  option:'
+
+        Return:
+        This methods returns a string with the value entered by the user.
+        """
+        userInput = raw_input(textDescription)
         return userInput
 
-    def validateUserInput(self, optionSelected, numberOptions):
+    def isValidSelectedNumberOption(self, optionSelected, numberOptions):
         """
-        This method returns a boolean value, validating the value entered by
-        the user against the number of options allowed.
+        This method casts the input user from a string to an integer and
+        validates that it is in the range of numberOptions allowed.
+
+        Keyword arguments:
+        optionSelected -- String with the value entered by the user.
+        numberOptions -- Maximum number of the options allowed.
+
+        Return:
+        The value returned is True in case that option entered is valid, False
+        otherwise.
         """
         res = False
         try:
             option = int(optionSelected)
-            if(option <= numberOptions and option > 0):
+            if(option > 0 and option <= numberOptions):
                 res = True
         except ValueError, e :
             print("'%s' is not a valid number of option."
                   % e.args[0].split(": ")[1])
         return res
 
-    def mainOptionsMenu(self):
-        """
-        This method displays the complete Menu of options for the
-        SUDOKU
-        """
-        gameOptions = self.settingsSudoku.getSudokuGameTypeOptions()
-        self.drawMenuOptions("Sudoku", gameOptions)
-        optionSelected = self.getUserInput()
-        while not self.validateUserInput(optionSelected, len(gameOptions)):
-            print("*****The option selected is not valid****")
-            optionSelected = self.getUserInput()
-        if(optionSelected == "1"):
-            print("The game will be solved ")
-            self.displayOptionsSelected()
-            optionSolveSettings = raw_input("\
-            Do you want to change the settings before solve the game? (Yes/No):")
-            if (optionSolveSettings == "Yes" or optionSolveSettings == "yes"):
-                self.outputFormatOptionsMenu()
-                self.algorithmOptionsMenu()
-                self.settingsSudoku.saveCurrentSettings()
-                self.displayOptionsSelected()
-                self.solveSudokuGame(self.settingsSudoku.getSudokuAlgorithmOption())
-            elif (optionSolveSettings == "No" or optionSolveSettings == "no"):
-                self.solveSudokuGame(self.settingsSudoku.getSudokuAlgorithmOption())
-        elif(optionSelected == "2"):
-            print("The game will be generated ")
-            self.settingsSudoku.setSudokuGameType("Generate")
-        elif(optionSelected == "3"):
-            print("Restoring to options by default...")
-            self.settingsSudoku.restoreDefaultSettings()
-            self.displayOptionsSelected()
-        elif(optionSelected == "4"):
-            print("Exit")
-        else:
-            print("Option unknown")
-
     def difficultyLevelOptionsMenu(self):
-        """ This method displays the Menu options for Difficulty Levels. """
+        """
+        This method displays in console the menu options for Difficulty Levels
+        extracted from Configuration XML file.
+        """
         difficultyLevelOptions = self.settingsSudoku.\
                                  getSudokuDifficultyLevelOptions()
-        self.drawMenuOptions("Change settings options", difficultyLevelOptions)
-        optionSelected = self.getUserInput()
-        while not self.validateUserInput(optionSelected,
-                                         len(difficultyLevelOptions)):
-            print("*****The option selected is not valid****")
-            optionSelected2 = self.getUserInput()
-        if(optionSelected == "1"):
+        self.displayMenuOptions("Change difficulty level option", difficultyLevelOptions)
+        optionValidated = self.askForValueUntilIsValid(difficultyLevelOptions)
+        if(optionValidated == "1"):
             print("Easy")
             self.settingsSudoku.setSudokuDifficultyLevel("Easy")
-        elif(optionSelected == "2"):
+        elif(optionValidated == "2"):
             print("Medium")
             self.settingsSudoku.setSudokuDifficultyLevel("Medium")
-        elif(optionSelected == "3"):
+        elif(optionValidated == "3"):
             print("Hard")
             self.settingsSudoku.setSudokuDifficultyLevel("Hard")
 
     def outputFormatOptionsMenu(self):
-        """ This method displays the Menu options for Output formats. """
+        """
+        This method displays in console the menu options for Output formats
+        extracted from Configuration XML file.
+        """
         outputFormatOptions = self.settingsSudoku.\
                               getSudokuOutputFormatOptions()
-        self.drawMenuOptions("Change input type format", outputFormatOptions)
-        optionSelected = self.getUserInput()
-        while not self.validateUserInput(optionSelected,
-                                         len(outputFormatOptions)):
-            print("*****The option selected is not valid****")
-            optionSelected = self.getUserInput()
-        if(optionSelected == "1"):
+        self.displayMenuOptions("Change input type format", outputFormatOptions)
+        optionValidated = self.askForValueUntilIsValid(outputFormatOptions)
+        if(optionValidated == "1"):
             print("Console")
             self.settingsSudoku.setSudokuOutputFormat("Console")
-        elif (optionSelected == "2"):
+        elif (optionValidated == "2"):
             print("File")
             self.settingsSudoku.setSudokuOutputFormat("File")
 
     def algorithmOptionsMenu(self):
         """
-        This method displays the Menu options for Algorithms available.
+        This method displays in console the Menu options for Algorithms available
+        extracted from Configuration XML file.
         """
         algorithmOptions = self.settingsSudoku.\
                            getSudokuAlgorithmSolutionOptions()
-        self.drawMenuOptions("Change algorithm used", algorithmOptions)
-        optionSelected = self.getUserInput()
-        while not self.validateUserInput(optionSelected,
-                                         len(algorithmOptions)):
-            print("*****The option selected is not valid****")
-            optionSelected = self.getUserInput()
-        if(optionSelected == "1"):
+        self.displayMenuOptions("Change algorithm used", algorithmOptions)
+        optionValidated = self.askForValueUntilIsValid(algorithmOptions)
+        if(optionValidated == "1"):
             print("BackTracking")
             self.settingsSudoku.setSudokuAlgorithmOption("BackTracking")
-        elif (optionSelected == "2"):
+        elif (optionValidated == "2"):
             print("Peter Norvig")
             self.settingsSudoku.setSudokuAlgorithmOption("Peter Norvig")
-        elif (optionSelected == "3"):
-            print("Exact")
-            self.settingsSudoku.setSudokuAlgorithmOption("Exact")
+        elif (optionValidated == "3"):
+            print("Quick Hackup")
+            self.settingsSudoku.setSudokuAlgorithmOption("Quick Hackup")
 
     def displayOptionsSelected(self):
-        """ This method displays options selected by the user """
-        print self.getAStringLine("=", 50)
+        """ This method displays in console the options selected by the user """
+        self.printLine("=", 50)
         print("These are the game settings selected: ")
-        print self.getAStringLine("=", 50)
+        self.printLine("=", 50)
         print self.settingsSudoku.getSudokuGameType()
         print self.settingsSudoku.getSudokuOutputFormat()
         print self.settingsSudoku.getSudokuAlgorithmOption()
 
     def displayOptionsSelectedByDefault(self):
-        """ This method displays options selected by default """
-        print self.getAStringLine("=", 50)
+        """ This method displays in console options selected by default """
+        self.printLine("=", 50)
         print("These are the game settings by default: ")
-        print self.getAStringLine("=", 50)
+        self.printLine("=", 50)
         print self.settingsSudoku.getSudokuGameType()
         print self.settingsSudoku.getSudokuOutputFormat()
         print self.settingsSudoku.getSudokuAlgorithmOption()
 
-    def solveSudokuGame(self, option):
+    def solveSudokuGame(self, optionAlgorithm):
         """
-        This method call to the respective class algorithm to solve a Sudoku
-        game depending on the option selected.
+        This method solves the Sudoku game with selected algorithm by the user.
         """
-        if option == "BackTracking":
+        if optionAlgorithm == "BackTracking":
             self.solveUsingBackTrackingAlgorithm()
-        if option == "Peter Norvig" :
+        if optionAlgorithm == "Peter Norvig" :
             self.solveUsingPeterNorvigAlgorithm()
-        if option == "Exact":
+        if optionAlgorithm == "Quick Hackup":
             self.solveUsingQuickHackupAlgorithm()
 
     def solveUsingBackTrackingAlgorithm(self):
         """
-        This method create a instance of BackTracking algorithm class and
-        solve the game by the string entered.
+        This method creates an instance of BackTracking algorithm child class
+        and solves the game by the string entered.
         """
         backtrackInstance = BacktrackingAlgorithm(self.getSudokuString())
         try:
@@ -216,8 +208,8 @@ class ConsoleMenu:
 
     def solveUsingPeterNorvigAlgorithm(self):
         """
-        This method create a instance of Peter Norvig algorithm class and
-        solve the game by the string entered.
+        This method creates an instance of Peter Norvig algorithm child class
+        and solves the game by the string entered.
         """
         peterInstance = PeterNorvigAlgorithm(self.getSudokuString())
         peterInstance.solveSudoku()
@@ -225,38 +217,49 @@ class ConsoleMenu:
 
     def solveUsingQuickHackupAlgorithm(self):
         """
-        This method create a instance of ForwardCheck algorithm class and
-        solve the game by the string entered.
+        This method creates an instance of ForwardCheck algorithm child class
+        and solves the game by the string entered.
         """
-        quickInstance = ForwardCheck(self.getSudokuString())
+        forwardInstance = ForwardCheck(self.getSudokuString())
         try:
-            quickInstance.solveSudoku()
+            forwardInstance.solveSudoku()
         except:
-            self.printSudokuSolved(quickInstance.puzzle, 20)
+            self.printSudokuSolved(forwardInstance.puzzle, 1)
 
     def getSudokuString(self):
         """
-        This method ask to the user for the Sudoku game to be solved depending
-        of the InputFormat selected from settings.
+        This method asks to the user for the Sudoku game to be solved.
+
+        If the option selected is Console, the input expected is a string with
+        the matrix unsolved:
+        '001093000000100004020060370700000005080504060400000008092080010100009000000340600'
+
+        If the optin selected is File, the input expected is the filename
+        which contains the matrix unsolved in .txt or .csv format.
+        i.e: 'SodukuGame.txt'
         """
         option = self.settingsSudoku.getSudokuOutputFormat()
         if option == "Console":
-            return raw_input("Enter the SUDOKU to be solved in a string line")
+            return self.getUserInput("Enter the SUDOKU to be solved in a string line")
         if option == "File":
-            sudokufile = SudokuTXTReader(raw_input("Please enter file name with extension"),
+            sudokuFile = SudokuTXTReader(self.getUserInput("Please enter file name with extension"),
                               self.settingsSudoku.getSudokuMatrixDimension())
-            if(sudokufile.isTXTContentValid()):
-                return sudokufile.readSudokuFromTXTFile()
+            if(sudokuFile.isTXTContentValid()):
+                return sudokuFile.readSudokuFromTXTFile()
             else:
                 print("The format of the file name introduced is not valid.")
 
     def printSudokuSolved(self, matrixSolved, runningTime):
         """
-        Prints the puzzle as a visual representation.
+        This method prints in console the Sudoku solved.
+
+        Keyword arguments:
+        matrixSolved -- Matrix array which contains the values of solved game.
+        runningTime -- Time spent to solve the game
         """
-        print self.getAStringLine("=", 50)
+        self.printLine("=", 50)
         print("      GAME SOLUTION       ")
-        print self.getAStringLine("=", 50)
+        self.printLine("=", 50)
         rowStrings = []
         for i in range(9):
             rowString = []
@@ -271,8 +274,12 @@ class ConsoleMenu:
 
     def formatRow(self, rowString):
         """
-        Return a string with '|'s inserted every 3 digits; format one row
-        for printing the puzzle neatly
+        Keyword arguments:
+        rowString -- String of the values of a row in the matrix.
+
+        Return:
+        String with '|'s inserted every 3 digits; format one row for printing
+        the puzzle neatly
         """
         formattedString = ""
         for i in range(0, len(rowString), 3):
@@ -282,8 +289,86 @@ class ConsoleMenu:
         return formattedString
 
     def validateInputStringGame(self, toValidateString):
-        """ This method validates the user entry for matrix to be solved. """
+        """
+        This method validates the user entry for matrix to be solved.
+
+        Keyword arguments:
+        toValidateString -- String with values of the matrix unsolved.
+
+        Return:
+        The validation returns True if all the values of the matrix unsolved are
+        digits (0-9) and they should be 81 numbers.
+        """
         resValidate = False
         if len(toValidateString) == 81 and toValidateString.isdigit():
             resValidate = True
         return resValidate
+
+    def solveGameWithChangedSettings(self):
+        """
+        This method calls the methods to change the following settings:
+        - OutputFormat
+        - AlgorithmOption
+        Save the changes in the Configuration.xml file and solve the game
+        with latest changes.
+        """
+        self.outputFormatOptionsMenu()
+        self.algorithmOptionsMenu()
+        self.settingsSudoku.saveCurrentSettings()
+        self.displayOptionsSelected()
+        self.solveSudokuGame(self.settingsSudoku.getSudokuAlgorithmOption())
+
+    def askForValueUntilIsValid(self, gameOptions):
+        """
+        This method ensure that user enter a valid value for the number option.
+
+        Keyword arguments:
+        gameOptions - List of strings with the list of options for a specific
+        setting readed from the .xml file
+
+        Return:
+        Value returned is a valid number option.
+
+        """
+        optionValid = self.getUserInput("Enter the number of the  option: ")
+        while not self.isValidSelectedNumberOption(optionValid, len(gameOptions)):
+            print("*****The option selected is not valid****")
+            optionValid = self.getUserInput("Enter the number of the  option: ")
+        return optionValid
+
+    def displayOptionsToSolveGame(self):
+        """
+        This method displays the user settings currently stored to 'Solve'
+        the Sudoku game in UserConfiguration.xml file or if the user prefers
+        change current settings.
+        """
+        self.displayOptionsSelected()
+        optionSolveSettings = self.getUserInput("\
+        Do you want to change the settings before solve the game? (Yes/No):")
+        if (optionSolveSettings == "Yes" or optionSolveSettings == "yes"):
+            self.solveGameWithChangedSettings()
+        elif (optionSolveSettings == "No" or optionSolveSettings == "no"):
+            self.solveSudokuGame(self.settingsSudoku.getSudokuAlgorithmOption())
+
+    def mainOptionsMenu(self):
+        """
+        This method displays the main Menu with options for the SUDOKU
+        game in console.
+        """
+        gameOptions = self.settingsSudoku.getSudokuGameTypeOptions()
+        self.displayMenuOptions("Sudoku", gameOptions)
+        optionValidated = self.askForValueUntilIsValid(gameOptions)
+        if(optionValidated == "1"):
+            print("The game will be solved ")
+            self.displayOptionsToSolveGame()
+        elif(optionValidated == "2"):
+            print("The game will be generated ")
+            self.settingsSudoku.setSudokuGameType("Generate")
+        elif(optionValidated == "3"):
+            print("Restoring to options by default...")
+            self.settingsSudoku.restoreDefaultSettings()
+            self.displayOptionsSelected()
+        elif(optionValidated == "4"):
+            print("Exit")
+        else:
+            print("Option unknown")

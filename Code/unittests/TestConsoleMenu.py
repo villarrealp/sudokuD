@@ -24,47 +24,18 @@ class TestConsoleMenu(unittest.TestCase):
 
     def testValidateUserInputWithOptionInRange(self):
         numberOptions = 4
-        self.assertTrue(self.myMenu.validateUserInput(self.optionInRangeNumber,
+        self.assertTrue(self.myMenu.isValidSelectedNumberOption(self.optionInRangeNumber,
                                                         numberOptions))
 
     def testValidateUserInputWithOptionNotInRange(self):
         numberOptions = 4
-        self.assertFalse(self.myMenu.validateUserInput(self.optionOutRangeNumber,
+        self.assertFalse(self.myMenu.isValidSelectedNumberOption(self.optionOutRangeNumber,
                                                          numberOptions))
 
     def testValidateUserInputWithOptionAsChar(self):
         numberOptions = 4
-        self.assertFalse(self.myMenu.validateUserInput(self.optionChar,
+        self.assertFalse(self.myMenu.isValidSelectedNumberOption(self.optionChar,
                                                          numberOptions))
 
 if __name__=='__main__':
         unittest.main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

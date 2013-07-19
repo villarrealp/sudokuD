@@ -22,6 +22,19 @@ from Algorithm import Algorithm
 from Queue import PriorityQueue
 from Queue import Queue
 
+
+"""
+Class Name: BacktrackingAlgorithm
+
+Description: This class is a child from Algorithm class.
+             Overrides parent method solveSudoku() to solve the game.
+Class attributes:
+        puzzle -- Matrix of integers, will contain the values of the solved game.
+        blanks -- Array of tuples, it contains position of the blank spots
+        in follow format: (rowIndex, colIndex)
+        runningTime -- Float to store the time taken during algorithm execution.
+"""
+
 class BacktrackingAlgorithm(Algorithm):
 
     def __init__(self, grids):
@@ -32,12 +45,6 @@ class BacktrackingAlgorithm(Algorithm):
         grids -- String which contains the unsolved game, it should have 81
         characters, all of them digits 0-9, for example:
         "008009320000080040900500007000040090000708000060020000600001008050030000072900100"
-
-        Class attributes:
-        puzzle -- Matrix of integers, will contain the values of the solved game.
-        blanks -- Array of tuples, it contains position of the blank spots
-        in follow format: (rowIndex, colIndex)
-        runningTime -- Float to store the time taken during algorithm execution.
         """
         Algorithm.__init__(self, grids)
 
@@ -49,22 +56,13 @@ class BacktrackingAlgorithm(Algorithm):
         """
         This method calls the methods to solve the Sudoku game using
         BackTracking Algorithm
-        """
-        matrixSudoku = self.convertStringToMatrix(self.grids)
-        self.puzzle = matrixSudoku
-        self.blanks = self.getEmptyCells(self.puzzle)
-        self.solve(self.puzzle)
-
-    def solve(self, puzzleArray):
-        """
-        Solve the Sudoku puzzle using the selected algorithm.
-
-        Keyword arguments:
-        puzzleArray -- Matrix of integers with the puzzle unsolved.
 
         Return:
         This method returns the puzzle solved using BackTracking algorithm.
         """
+        matrixSudoku = self.convertStringToMatrix(self.grids)
+        self.puzzle = matrixSudoku
+        self.blanks = self.getEmptyCells(self.puzzle)
         print "Solving with backtracking."
         self.runningTime = time.clock()
         self.backTrack(0)
