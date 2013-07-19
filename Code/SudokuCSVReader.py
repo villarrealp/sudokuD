@@ -28,7 +28,7 @@ class SudokuCSVReader():
                         "newCSVFile.csv".
         sizeSudoku -- integer value of the expected size of the sudoku(i.e. 9).
         """
-        self._txtFileName = txtFileName
+        self._csvFileName = txtFileName
         self._sizeSudoku = sizeSudoku
         self.lisOfSudokuLines = []
         self.sudokuString = ""
@@ -39,7 +39,7 @@ class SudokuCSVReader():
         This method open and read the CSV file content, sets all the lines in
         the CSV in a list called self.lisOfSudokuLines, does not return anything.
         """
-        with open(self._txtFileName, 'rb') as csvFile:
+        with open(self._csvFileName, 'rb') as csvFile:
             content = csv.reader(csvFile, delimiter = self.rowSeparator,
                         quoting = csv.QUOTE_NONE)
             for row in content:
@@ -83,7 +83,7 @@ class SudokuCSVReader():
         filename -- Is a string value of the name for the new CSV file  (i.e.
                     "newCSVFile.csv".
         """
-        self._txtFileName = filename
+        self._csvFileName = filename
 
     def isDimensionAccurate(self):
         """
@@ -102,7 +102,7 @@ class SudokuCSVReader():
         final Sudoku string size is the expected one, returns False otherwise.
         """
         if(self._countRowsSizeEntries() and self.areOnlyAllowedNumbers() and
-            isDimensionAccurate() and self.isSizeAccurate()):
+            self.isDimensionAccurate() and self.isSizeAccurate()):
             return True
         else:
             return False
