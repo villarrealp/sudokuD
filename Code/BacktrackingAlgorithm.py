@@ -62,7 +62,7 @@ class BacktrackingAlgorithm(Algorithm):
         """
         matrixSudoku = self.convertStringToMatrix(self.grids)
         self.puzzle = matrixSudoku
-        self.blanks = self.getEmptyCells(self.puzzle)
+        self.blanks = self.getEmptyCells()
         print "Solving with backtracking."
         self.runningTime = time.clock()
         self.backTrack(0)
@@ -183,13 +183,10 @@ class BacktrackingAlgorithm(Algorithm):
         self.runningTime = time.clock() - self.runningTime
         sys.exit(0)
 
-    def getEmptyCells(self, puzzle):
+    def getEmptyCells(self):
         """
         This method searchs for the empty places in the matrix (the places with
         0 as value) and store its position (row, column) in the emptyCells array.
-
-        Keyword arguments:
-        puzzle -- Matrix of integers which contains unsolved game.
 
         Return:
         This method returns an array of tuples with the positios of empty

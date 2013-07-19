@@ -60,8 +60,13 @@ class ConsoleMenu:
 
         Keyword arguments:
         title -- String with description of the menu to be displayed.
+        i.e: "Sudoku" , "Change input type format"
         listOfOptions -- List of strings with the available options to be
         displayed extracted from the XMLfile.
+        i.e: 1. Solve
+             2. Generate
+             3. Change Settings
+             4. Exit
         """
         self.printLine("=", 50)
         print("                  ") + title
@@ -83,7 +88,7 @@ class ConsoleMenu:
         input, i.e.: 'Enter the number of the  option:'
 
         Return:
-        This methods returns a string with the value entered by the user.
+        This method returns a string with the value entered by the user.
         """
         userInput = raw_input(textDescription)
         return userInput
@@ -234,7 +239,7 @@ class ConsoleMenu:
         the matrix unsolved:
         '001093000000100004020060370700000005080504060400000008092080010100009000000340600'
 
-        If the optin selected is File, the input expected is the filename
+        If the option selected is File, the input expected is the filename
         which contains the matrix unsolved in .txt or .csv format.
         i.e: 'SodukuGame.txt'
         """
