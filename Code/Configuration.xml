@@ -3,18 +3,18 @@
         <GameOption>
             <item name="Solve" />
             <item name="Generate" />
-            <item name="Change Settings" />
+            <item name="Change Settings to default" />
             <item name="Exit" />
         </GameOption>
         <DifficultyLevel>
-            <item bottonLimits="15" name="Easy" topLimits="20" />
-            <item bottonLimits="21" name="Medium" topLimits="35" />
-            <item bottonLimits="36" name="Hard" topLimits="55" />
+            <item bottonLimits="36" name="Easy" topLimits="55" />
+            <item bottonLimits="30" name="Medium" topLimits="35" />
+            <item bottonLimits="20" name="Hard" topLimits="25" />
         </DifficultyLevel>
         <AlgorithmOption>
             <item name="BackTracking" />
             <item name="Peter Norvig" />
-            <item name="ForwardCheck" />
+            <item name="Forward Check" />
         </AlgorithmOption>
         <OutputFormat>
             <item name="Console" />
@@ -30,7 +30,7 @@
             <item bottonLimits="15" name="Easy" topLimits="20" />
         </DifficultyLevel>
         <AlgorithmOption>
-            <item name="Peter Norvig" />
+            <item name="BackTracking" />
         </AlgorithmOption>
         <OutputFormat>
             <item name="File" />

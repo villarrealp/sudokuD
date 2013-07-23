@@ -9,6 +9,7 @@ Revised by:
 
 """
 from ConsoleMenu import ConsoleMenu
+import sys
 
 """
 This file instantiate an object of ConsoleMenu receiving following arguments:
@@ -18,3 +19,5 @@ UserDefaultSettings.xml file which contains the settings by default of the game.
 
 gameMenu = ConsoleMenu('Configuration.xml','UserDefaultSettings.xml')
 gameMenu.mainOptionsMenu()
+while True:
+    gameMenu.mainOptionsMenu()

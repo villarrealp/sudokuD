@@ -108,7 +108,7 @@ class ConfigurationXML:
         optionGameOptionSelected -- a string that contains the option selected
         to write in the xml file e.g. 'Easy'
         """
-        self.WriteXMLDificultyLevel('./UserSettings/DifficultyLevel/',\
+        self.saveXMLDificultyLevel('./UserSettings/DifficultyLevel/',\
                       optionGameOptionSelected)
 
     def saveXMLDificultyLevel(self, node, newLevel):

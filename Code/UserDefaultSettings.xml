@@ -1,11 +1,10 @@
 <ConfigurationFile>
-
     <UserSettings>
         <GameOption>
             <item name="Solve" />            
         </GameOption>
         <DifficultyLevel>
-            <item name="Easy" />
+            <item bottonLimits="15" name="Easy" topLimits="20" />
         </DifficultyLevel>
         <AlgorithmOption>
             <item name="BackTracking" />
@@ -14,7 +13,7 @@
             <item name="Console" />
         </OutputFormat>
         <FilePath>
-            <item name="c:\user\" />
+            <item name="..\Sudoku\" />
         </FilePath>
         <FileName>
             <item name="SudokuFile.txt" />

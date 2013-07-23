@@ -1,7 +1,7 @@
 """
 Author: Debbie Rios
 Date: 07/04/2013
-Modified:   07/17/2013   by: Debbie Rios
+Modified:   07/16/2013   by: Debbie Rios
 Comments: Changes following standard, and comments from Edson Gonzales
 Revised by:
 
@@ -9,10 +9,13 @@ Revised by:
 import time, random
 from Algorithm import Algorithm
 
+from Level import Level
+
 """
 Class Name: PeterNorvigAlgorithm
 Description: resolve sudoku puzzle, using constraint propagation
 and search methods.
+
 Throughout this program we have:
    u is a unit,   e.g. ['A1','B1','C1','D1','E1','F1','G1','H1','I1']
    grid is a grid,e.g. 81 non-blank chars, e.g. starting with '.18...7...
@@ -37,30 +40,32 @@ class PeterNorvigAlgorithm(Algorithm):
         """ Constructor of the class
 
         Keyword arguments:
-        grids -- the string data of the sudoku without resoved.e.g "00302060...."
+        grids -- string whit grid of the sudoku to resolve, 81 non-blank
+        chars e.g "00302060..
         sep -- each file of 9 should be sep for '\n'
         """
-        self.digits = '123456789' # Valid digits of sudoku grid will contain.
-        self.rows = 'ABCDEFGHI' # Each row of the sudoku grid will contain.
-        self.cols = self.digits # Each col of sudoku grid will contain.
+        self.digits   = '123456789'  # Valid digits of sudoku grid will contain.
+        self.rows     = 'ABCDEFGHI'  # Each row of the sudoku grid will contain.
+        self.cols     = self.digits  # Each col of sudoku grid will contain.
 
         # Each square of sudoku grid, 9 squares per sudoku e.g 'A3'
-        self.squares = self.crossProduct(self.rows, self.cols)
+        self.squares  = self.crossProduct(self.rows, self.cols)
 
-        # List of units in  the sudoku
-        self.unitlist = ([self.crossProduct(self.rows, col) for col in self.cols] +
-                    [self.crossProduct(row, self.cols) for row in self.rows] +
-                    [self.crossProduct(rs, cs) for rs in ('ABC', 'DEF', 'GHI')\
-                     for cs in ('123', '456', '789')])
+        # List of units in the sudoku  e.g. ['A1','B1','C1','D1','E1','F1','G1','H1','I1']
+        self.unitlist = ([self.crossProduct(self.rows, c) for c in self.cols] +
+                    [self.crossProduct(r, self.cols) for r in self.rows] +
+                    [self.crossProduct(rs, cs) for rs in ('ABC','DEF','GHI')\
+                                             for cs in ('123','456','789')])
 
         # Each unit of sudoku into a dictionary e.g ['A1','B1',...,'I1']
-        self.units = dict((square, [unit for unit in self.unitlist if square in unit])\
-                        for square in self.squares)
+        self.units = dict((s, [u for u in self.unitlist if s in u])\
+                                 for s in self.squares)
 
         # Each square has 20 peers
-        self.peers = dict((square, set(sum(self.units[square], []))\
-                            -set([square])) for square in self.squares)
+        self.peers = dict((s, set(sum(self.units[s],[]))-set([s]))\
+                                            for s in self.squares)
 
+        self.resultString = " "
         # Constructor of the class algorithm
         Algorithm.__init__(self, grids.strip().split(sep))
 
@@ -69,7 +74,8 @@ class PeterNorvigAlgorithm(Algorithm):
         This method convert a grid to a dict of possible values.
 
         Keyword arguments:
-        grid -- string whit a grid of the sudoku to resolve. e.g "00302060...."
+        grid -- string of the grid of the sudoku to resolve, 81 non-blank
+        chars e.g "00302060..
 
         Return:
         A dic of {square: digits}, or return False if a contradiction is detected.
@@ -86,7 +92,8 @@ class PeterNorvigAlgorithm(Algorithm):
         This method convert a grid into a dict.
 
         Keyword arguments:
-        grid -- the grid of the sudoku  to resolve. e.g "00302060...."
+        grid -- string of the grid of the sudoku to resolve, 81 non-blank
+        chars e.g "00302060..
 
         Return:
         A dic of {square: char} with '0' or '.' for empties
@@ -103,7 +110,7 @@ class PeterNorvigAlgorithm(Algorithm):
         and propagate.
 
         Keyword arguments:
-        value -- dict of possible values to resolve the sudoku
+        values -- dict of possible values to resolve the sudoku
         e.g. {'A1':'12349', 'A2':'8', ...}
         square -- string of each unit of the matriz of the sudoku e.g. I9
         digit -- string of each possible digit to resolve the sudoku e.g '8'
@@ -113,8 +120,7 @@ class PeterNorvigAlgorithm(Algorithm):
         is detected.
         """
         other_values = values[square].replace(digit, '')
-        if all(self.eliminate(values, square, nextDigit)\
-                             for nextDigit in other_values):
+        if all(self.eliminate(values, square, nextDigit) for nextDigit in other_values):
             return values
         else:
             return False
@@ -185,9 +191,20 @@ class PeterNorvigAlgorithm(Algorithm):
                 return False            # Contradiction: no place for this value
             elif len(dplaces) == 1:
                 # digit can only be in one place in unit; assign it there
-                if not self.assign(values, dplaces[0], digit):
+                if not self.assignPosibleValues(values, dplaces[0], digit):
                     return False
         return values
+
+
+    def solve(self, grid):
+        """Search method, call to search and parseGrid methods,
+        and return the grid resolved.
+
+        Keyword arguments:
+        grid -- string of the grid of the sudoku to resolve, 81 non-blank
+        chars e.g "00302060..
+        """
+        return self.deepSearch(self.parseGrid(grid))
 
     def deepSearch(self, values):
         """
@@ -205,11 +222,11 @@ class PeterNorvigAlgorithm(Algorithm):
             return False                                        # Failed earlier
         if all(len(values[square]) == 1 for square in self.squares):
             return values                                              # Solved!
-        # Chose the unfilled square square with the fewest possibilities
-        n, square = min((len(values[square]), square) for square in self.squares \
-                                        if len(values[square]) > 1)
-        return self.validValues(self.deepSearch(self.assign(values.copy(), \
-                        square, digit)) for digit in values[square])
+        # Chose the unfilled square 'square' with the fewest possibilities
+        n, square = min((len(values[square]), square) for square in self.squares\
+                         if len(values[square]) > 1)
+        return self.validValues(self.deepSearch(self.assignPosibleValues(values.copy(), square, digit))\
+                             for digit in values[square])
 
     def validValues(self, seq):
         """This method return the valid values of seq that is true.
@@ -233,34 +250,11 @@ class PeterNorvigAlgorithm(Algorithm):
         random.shuffle(seq)
         return seq
 
-    def getMatrix(self, values):
-        """ This method return the sudoku into a matrix.
-
-        Keyword arguments:
-        values -- dict of possible values to resolve the sudoku,
-        e.g. {'A1':'12349', 'A2':'8', ...}
-        """
-        dictList = []
-        matrix = sorted(dict.items(values))
-        for key, value in matrix:
-            temp = [key, value]
-            dictList.append(value)
-        self.solution = self.convertStringToMatrix(dictList)
-
-    def solve(self, grid):
-        """Search method, call to search and parseGrid methods,
-        and return the grid resolved.
-
-        Keyword arguments:
-        grid -- the grid of the sudoku  to resolve. e.g "00302060...."
-        """
-        return self.deepSearch(self.parseGrid(grid))
-
-    def solveSudoku(self):
+    def solveSudoku(self, name='', showif=0.0):
         """
         Attempt to solve a sequence of grids. Report results.
         """
-        def timeSolve(grid):
+        def time_solve(grid):
             """
             This method displays the time that its take to solve any sudoku.
 
@@ -275,5 +269,106 @@ class PeterNorvigAlgorithm(Algorithm):
             self.runningTime = time.clock() - start
             self.getMatrix(values)
             return (self.runningTime, self.solved(values))
-        times, results = zip( * [timeSolve(grid) for grid in self.grids])
+        times, results = zip(*[time_solve(grid) for grid in self.grids])
 
+    def solved(self, values):
+        "A puzzle is solved if each unit is a permutation of the digits 1 to 9."
+
+        def unitsolved(unit):
+            """
+            This method return each unit of the sudoku solved.
+
+            Keyword arguments:
+            unit -- string to each unit of sudoku into a dictionary e.g ['A1','B1',...,'I1']
+            """
+            return set(values[s] for s in unit) == set(digits)
+            return values is not False and all(unitsolved(unit) for unit in unitlist)
+
+    def getMatrix(self, values):
+        """
+        This method return the sudoku into a matrix.
+
+        Keyword arguments:
+        values -- dict of possible values to resolve the sudoku,
+        e.g. {'A1':'12349', 'A2':'8', ...}
+        """
+        dictList = []
+        matrix = sorted(dict.items(values))
+        for key, value in matrix:
+            temp = [key, value]
+            dictList.append(value)
+        self.solution = self.convertStringToMatrix(dictList)
+
+##To generate Random sudokus
+    def displayGenerateSudoku(self, sudokuValues):
+        """
+        This method receives the sudoku generated and display these
+        sudoku values as a 2-D grid.
+
+        Keyword arguments:
+        sudokuValues -- string with the values of the generated sudoku randomicaly
+        Return:
+        None.
+        """
+        width = 1 + max(len(sudokuValues[square]) for square in self.squares)
+        line = '+'.join(['-'*(width * 3)] * 3)
+        for row in self.rows:
+            print ''.join(sudokuValues[row + col].center(width)+('|' if col in '36' else '')
+                          for col in self.cols)
+            if row in 'CF': print line
+
+
+    def getDifficultLevel(self, levelNumber):
+        """
+        This method returns an integer with a randomic number, between limits
+        of each level.
+
+        Keyword arguments:
+        levelNumber -- an integer e.g. 30
+        """
+        randomEmptySpaces = random.randint(levelNumber.getBottomLimit(), levelNumber.getTopLimit())
+        return self.randomPuzzle(randomEmptySpaces)
+
+
+    def randomPuzzle(self, dificultLevel):
+        """
+        This method generate a random puzzle with N or more assignments.
+        Also use methods to resolve in order to verify the consistence
+        of the sudoku generated.
+
+        Restart on contradictions.
+        Note the resulting puzzle is not guaranteed to be solvable, but empirically
+        about 99.8% of them are solvable. Some have multiple solutions.
+
+        Keyword arguments:
+        difficultyLevel -- an integer with a number between two limits e.g. 25
+
+        Return:
+        A string with the values of the sudoku generated.
+        """
+        values = dict((square, self.digits) for square in self.squares)
+        for square in self.shuffled(self.squares):
+            if not self.assignPosibleValues(values , square, random.choice(values[square])):
+                break
+            ds = [values[square] for square in self.squares if len(values[square]) == 1]
+            if len(ds) >= dificultLevel and len(set(ds)) >= 8:
+                self.resultString = ''.join(values[square] if len(values[square]) == 1 else '.' for square in self.squares)
+                return ''.join(values[square] if len(values[square]) == 1 else '.' for square in self.squares)
+        return self.randomPuzzle(dificultLevel) ## Give up and make a new puzzle
+
+    def convertStringGeneratedToMatrix(self, stringGenerated ):
+        matrixResult = [[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ],
+                        [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' ]]
+        count = 0
+        for row in range(9):
+            for col in range(9):
+                matrixResult[row][col] = stringGenerated[count]
+                count = count + 1
+        return matrixResult
