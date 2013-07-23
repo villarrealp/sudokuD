@@ -26,7 +26,7 @@ from BacktrackingAlgorithm import BacktrackingAlgorithm
 from SudokuTXTReader import SudokuTXTReader
 from Level import Level
 from SudokuCSVReader import SudokuCSVReader
-from SudokyTXTWriter import SudokuTXTWriter
+from SudokuTXTWriter import SudokuTXTWriter
 
 
 """
@@ -152,7 +152,7 @@ class ConsoleMenu:
         self.displayListOfLevelsFromXMLFile()
         difficultyLevelOptions = self.settingsSudoku.\
                                  getSudokuDifficultyLevelOptions()
-        difficultyLevelOptions.append(Level(0,0, " "))
+        difficultyLevelOptions.append(Level(0, 0, " "))
         optionValidated = self.askForValueUntilIsValid(difficultyLevelOptions)
         if(optionValidated == "1"):
             print("Easy")
@@ -177,7 +177,7 @@ class ConsoleMenu:
         to generate Sudoku games.
         Note. This level will not be stored in the .xml file
         """
-        userLevel = Level(0,0,"Custom level")
+        userLevel = Level(0, 0, "Custom level")
         userLevel.setBottomLimit = int(self.getUserInput("\
         Please enter a number to set the minimun limit for empty spaces"))
         userLevel.setTopLimit = int(self.getUserInput("\
@@ -441,4 +441,5 @@ class ConsoleMenu:
         level option to generate the game.
         """
         generate = PeterNorvigAlgorithm('')
-        generate.displayGenerateSudoku(generate.getGridValues(generate.getDifficultLevel(rangeToGenerateLevel)))
+        generate.displayGenerateSudoku(generate.getGridValues(generate.\
+        getDifficultLevel(rangeToGenerateLevel)))
