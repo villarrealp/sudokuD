@@ -428,7 +428,13 @@ class ConsoleMenu:
             self.settingsSudoku.restoreDefaultSettings()
             self.displayOptionsSelected()
         elif(optionValidated == "4"):
+<<<<<<< HEAD
             sys.exit(0)
+=======
+            print("Exit")
+        else:
+            print("Option unknown")
+>>>>>>> 332443f231733e534c8d05dedd4093438c9c7692
 
     def generateSudoku(self, rangeToGenerateLevel):
         """
@@ -440,8 +446,12 @@ class ConsoleMenu:
         """
         generate = PeterNorvigAlgorithm('')
         generate.displayGenerateSudoku(generate.getGridValues(generate.\
+<<<<<<< HEAD
         getDifficultLevel(rangeToGenerateLevel)))
         stringGeneratedSudoku = generate.resultString
         charMatrix = generate.convertStringGeneratedToMatrix(stringGeneratedSudoku)
         fileGenerated = SudokuTXTWriter(charMatrix)
         fileGenerated.writeToTXTFile()
+=======
+        getDifficultLevel(rangeToGenerateLevel)))
+>>>>>>> 332443f231733e534c8d05dedd4093438c9c7692

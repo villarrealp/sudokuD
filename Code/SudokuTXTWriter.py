@@ -41,11 +41,15 @@ class SudokuTXTWriter:
         for i in range(9):
             rowString = ""
             for j in range(9):
+<<<<<<< HEAD
                 if (self.matrixGenerated[i][j] != "."):
                     rowString += str(self.matrixGenerated[i][j])+""
                 else:
                     rowString += "0" + ""
 
+=======
+                rowString += str(self.matrixGenerated[i][j])+" "
+>>>>>>> 332443f231733e534c8d05dedd4093438c9c7692
             outFile.write(rowString+'\n')
         outFile.close()
         print("File named: %s was created." %nameGenerated)
@@ -60,6 +64,10 @@ class SudokuTXTWriter:
         String of the file name generated.
         """
         basename = "Generated"
+<<<<<<< HEAD
         suffix = datetime.datetime.now().strftime("%y-%m-%d_%H%M%S") + ".txt"
+=======
+        suffix = datetime.datetime.now().strftime("%y-%m-%d_%H%M%S")
+>>>>>>> 332443f231733e534c8d05dedd4093438c9c7692
         fileName = "_".join([basename, suffix])
         return fileName
