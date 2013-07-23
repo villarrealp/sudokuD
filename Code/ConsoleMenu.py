@@ -8,17 +8,25 @@ Modified:       07/04/2013 by Pilar Villarreal
                 added comments to methods to display the solved matrix.
                 07/18/2013 by Pilar Villarreal
                 Comments: Code refactoring and added more documentation.
+                07/22/2013 by Pilar Villarreal
+                Comments: Created methods to support Generate Sudoku games and
+                write them in a .txt file.
+                Solve game using .csv files
 Revised by: -
 
 """
 
 import sys
 import time
+import os
 from Settings import Settings
 from PeterNorvigAlgorithm import PeterNorvigAlgorithm
 from ForwardCheck import ForwardCheck
 from BacktrackingAlgorithm import BacktrackingAlgorithm
 from SudokuTXTReader import SudokuTXTReader
+from Level import Level
+from SudokuCSVReader import SudokuCSVReader
+from SudokyTXTWriter import SudokuTXTWriter
 
 
 """
@@ -116,24 +124,65 @@ class ConsoleMenu:
                   % e.args[0].split(": ")[1])
         return res
 
-    def difficultyLevelOptionsMenu(self):
+    def displayListOfLevelsFromXMLFile(self):
         """
-        This method displays in console the menu options for Difficulty Levels
-        extracted from Configuration XML file.
+        This method displays in console the menu options for the Difficulty
+        levels, their names and details.
         """
+        self.printLine("=", 50)
+        print("                  ") + "Change difficulty level option"
+        self.printLine("=", 50)
+        print("         Please select an option:")
         difficultyLevelOptions = self.settingsSudoku.\
                                  getSudokuDifficultyLevelOptions()
-        self.displayMenuOptions("Change difficulty level option", difficultyLevelOptions)
+        for indexList in range(len(difficultyLevelOptions)):
+            levelName = difficultyLevelOptions[indexList].getNameLevel()
+            levelBLimit = str(difficultyLevelOptions[indexList].getBottomLimit())
+            levelTLimit = str(difficultyLevelOptions[indexList].getTopLimit())
+            print("                 " + str(indexList + 1) + ". " + levelName +
+            "\tMinimum:" + levelBLimit + "\tMaximum:"+ levelTLimit )
+        print("                 " + str(indexList + 2) + ". " + "Set a custom level")
+
+    def difficultyLevelOptionsMenu(self):
+        """
+        This method displays the list of levels extracted from XML File, and
+        allows to the user choose between use one of them or use another level
+        customized.
+        """
+        self.displayListOfLevelsFromXMLFile()
+        difficultyLevelOptions = self.settingsSudoku.\
+                                 getSudokuDifficultyLevelOptions()
+        difficultyLevelOptions.append(Level(0,0, " "))
         optionValidated = self.askForValueUntilIsValid(difficultyLevelOptions)
         if(optionValidated == "1"):
             print("Easy")
             self.settingsSudoku.setSudokuDifficultyLevel("Easy")
+            self.generateSudoku(difficultyLevelOptions[0])
         elif(optionValidated == "2"):
             print("Medium")
             self.settingsSudoku.setSudokuDifficultyLevel("Medium")
+            self.generateSudoku(difficultyLevelOptions[1])
         elif(optionValidated == "3"):
             print("Hard")
             self.settingsSudoku.setSudokuDifficultyLevel("Hard")
+            print type(difficultyLevelOptions[2])
+            self.generateSudoku(difficultyLevelOptions[2])
+        elif(optionValidated == "4"):
+            print("Custom level")
+            self.generateSudoku(self.readDetailsForCustomLevel())
+
+    def readDetailsForCustomLevel(self):
+        """
+        This method allows to the user create and use a new customized level
+        to generate Sudoku games.
+        Note. This level will not be stored in the .xml file
+        """
+        userLevel = Level(0,0,"Custom level")
+        userLevel.setBottomLimit = int(self.getUserInput("\
+        Please enter a number to set the minimun limit for empty spaces"))
+        userLevel.setTopLimit = int(self.getUserInput("\
+        Please enter a number to set the maximun limit for empty spaces"))
+        return userLevel
 
     def outputFormatOptionsMenu(self):
         """
@@ -167,8 +216,8 @@ class ConsoleMenu:
             print("Peter Norvig")
             self.settingsSudoku.setSudokuAlgorithmOption("Peter Norvig")
         elif (optionValidated == "3"):
-            print("Quick Hackup")
-            self.settingsSudoku.setSudokuAlgorithmOption("Quick Hackup")
+            print("Forward Check")
+            self.settingsSudoku.setSudokuAlgorithmOption("Forward Check")
 
     def displayOptionsSelected(self):
         """ This method displays in console the options selected by the user """
@@ -196,8 +245,8 @@ class ConsoleMenu:
             self.solveUsingBackTrackingAlgorithm()
         if optionAlgorithm == "Peter Norvig" :
             self.solveUsingPeterNorvigAlgorithm()
-        if optionAlgorithm == "Quick Hackup":
-            self.solveUsingQuickHackupAlgorithm()
+        if optionAlgorithm == "Forward Check":
+            self.solveUsingQForwardCheckAlgorithm()
 
     def solveUsingBackTrackingAlgorithm(self):
         """
@@ -220,7 +269,7 @@ class ConsoleMenu:
         peterInstance.solveSudoku()
         self.printSudokuSolved(peterInstance.solution, peterInstance.runningTime)
 
-    def solveUsingQuickHackupAlgorithm(self):
+    def solveUsingQForwardCheckAlgorithm(self):
         """
         This method creates an instance of ForwardCheck algorithm child class
         and solves the game by the string entered.
@@ -229,7 +278,7 @@ class ConsoleMenu:
         try:
             forwardInstance.solveSudoku()
         except:
-            self.printSudokuSolved(forwardInstance.puzzle, 1)
+            self.printSudokuSolved(forwardInstance.puzzle, forwardInstance.runningTime)
 
     def getSudokuString(self):
         """
@@ -247,12 +296,15 @@ class ConsoleMenu:
         if option == "Console":
             return self.getUserInput("Enter the SUDOKU to be solved in a string line")
         if option == "File":
-            sudokuFile = SudokuTXTReader(self.getUserInput("Please enter file name with extension"),
-                              self.settingsSudoku.getSudokuMatrixDimension())
-            if(sudokuFile.isTXTContentValid()):
-                return sudokuFile.readSudokuFromTXTFile()
-            else:
-                print("The format of the file name introduced is not valid.")
+            fileNameFull = self.getUserInput("Please enter file name with extension")
+            if os.path.exists(fileNameFull):
+                fileName, fileExtension = os.path.splitext(fileNameFull)
+                if fileExtension == ".txt":
+                    txtFile = SudokuTXTReader(fileNameFull, self.settingsSudoku.getSudokuMatrixDimension())
+                    return txtFile.readSudokuFromTXTFile()
+                if fileExtension == ".csv":
+                    csvFile = SudokuCSVReader(fileNameFull, self.settingsSudoku.getSudokuMatrixDimension())
+                    return csvFile.getSudokuString()
 
     def printSudokuSolved(self, matrixSolved, runningTime):
         """
@@ -369,6 +421,8 @@ class ConsoleMenu:
         elif(optionValidated == "2"):
             print("The game will be generated ")
             self.settingsSudoku.setSudokuGameType("Generate")
+            self.difficultyLevelOptionsMenu()
+            #self.generateSudoku()
         elif(optionValidated == "3"):
             print("Restoring to options by default...")
             self.settingsSudoku.restoreDefaultSettings()
@@ -377,3 +431,14 @@ class ConsoleMenu:
             print("Exit")
         else:
             print("Option unknown")
+
+    def generateSudoku(self, rangeToGenerateLevel):
+        """
+        This method calls to the functions needed to generate a Sudoku Game using
+        specified range from a level selected.
+        Keyword arguments:
+        rangeToGenerateLevel -- Range of integers calculated from the specified
+        level option to generate the game.
+        """
+        generate = PeterNorvigAlgorithm('')
+        generate.displayGenerateSudoku(generate.getGridValues(generate.getDifficultLevel(rangeToGenerateLevel)))
